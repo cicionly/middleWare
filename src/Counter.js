@@ -12,28 +12,18 @@ export default class Counter extends React.Component{
     }
 }
 
-// let promise = store => next => action =>{
-//     if(action.then){
-//         return action.then((data)=>next(data));
-//     }
-//     return next(action);
-// }
-
-let chunk = store => next => action =>{
-    if(typeof action === "function"){
-        return action(next);
-    }
-    return next(action);
+let logger1 = store =>next=>action=>{
+    console.log("logger1 before");
+    next(action);
+    console.log("logger1 after");
 }
 
-let store = applyMiddleWare(chunk)(createStore)(reducer);
-store.dispatch((dispatch)=>{
-    setTimeout(()=>dispatch({type:ADD}),3000)
-})
+let logger2 = store =>next=>action=>{
+    console.log("logger2 before");
+    next(action);
+    console.log("logger2 after");
+}
 
-// let store = applyMiddleWare(promise)(createStore)(reducer);
-// store.dispatch(new Promise((resolve,reject)=>{
-//     setTimeout(()=>resolve({type:ADD}),3000);
-// }));
-
-store.subscribe(()=>console.log(store.getState()));
+let store = applyMiddleWare(logger1,logger2)(createStore)(reducer);
+store.subscribe(()=>{console.log(store.getState())})
+store.dispatch({type:ADD})
